@@ -11,7 +11,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   REGISTRY: docker.io
-  IMAGE_NAME: gadekarnitesh/metrixd
+  IMAGE_NAME: niteshgadekar/metrixd
 
 jobs:
   test:
