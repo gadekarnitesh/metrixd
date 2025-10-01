@@ -62,11 +62,17 @@ curl http://localhost:9100/metrics
 git clone https://github.com/yourusername/metrixd.git
 cd metrixd
 
+# Set up pre-commit hooks (recommended for development)
+./setup-hooks.sh
+
 # Build in release mode
 cargo build --release
 
 # Run the daemon
 ./target/release/metrixd
+
+# Or run in development mode
+cargo run
 ```
 
 The metrics server will start on `http://localhost:9100/metrics`
@@ -164,19 +170,45 @@ scrape_configs:
 
 ## Development
 
-### Running Tests
+### Pre-commit Hooks
+
+MetrixD includes pre-commit hooks that run the same checks as the CI pipeline:
+
 ```bash
-cargo test
+# Set up hooks (one-time setup)
+./setup-hooks.sh
+
+# What the hooks check:
+# - Code formatting (cargo fmt)
+# - Clippy lints (cargo clippy)
+# - All tests pass (cargo test)
+# - Cargo.lock is up to date
+# - Common issues (TODO comments, debug prints)
 ```
 
-### Code Formatting
+The hooks will automatically run before each commit and prevent commits that don't pass all checks.
+
+### Manual Development Commands
+
 ```bash
-cargo fmt
+# Format code
+cargo fmt --all
+
+# Run lints
+cargo clippy --all-targets --all-features -- -D warnings
+
+# Run tests
+cargo test --verbose
+
+# Fix some clippy issues automatically
+cargo clippy --fix
 ```
 
-### Linting
+### Bypassing Hooks (Not Recommended)
+
 ```bash
-cargo clippy
+# Only use in emergencies
+git commit --no-verify -m "Emergency commit"
 ```
 
 ### Local Development
