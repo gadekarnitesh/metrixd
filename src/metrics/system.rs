@@ -1,7 +1,7 @@
-use prometheus::{register_gauge, Gauge};
 use crate::collector::Collector;
-use sysinfo::System;
+use prometheus::{register_gauge, Gauge};
 use std::sync::Mutex;
+use sysinfo::System;
 
 pub struct SystemCollector {
     load_average_1min: Gauge,
@@ -14,13 +14,17 @@ pub struct SystemCollector {
 
 impl SystemCollector {
     pub fn new() -> Self {
-        let load_average_1min = register_gauge!("load_average_1min", "System load average over 1 minute").unwrap();
-        let load_average_5min = register_gauge!("load_average_5min", "System load average over 5 minutes").unwrap();
-        let load_average_15min = register_gauge!("load_average_15min", "System load average over 15 minutes").unwrap();
+        let load_average_1min =
+            register_gauge!("load_average_1min", "System load average over 1 minute").unwrap();
+        let load_average_5min =
+            register_gauge!("load_average_5min", "System load average over 5 minutes").unwrap();
+        let load_average_15min =
+            register_gauge!("load_average_15min", "System load average over 15 minutes").unwrap();
         let uptime_seconds = register_gauge!("uptime_seconds", "System uptime in seconds").unwrap();
-        let process_count = register_gauge!("process_count", "Number of running processes").unwrap();
+        let process_count =
+            register_gauge!("process_count", "Number of running processes").unwrap();
         let system = Mutex::new(System::new_all());
-        
+
         SystemCollector {
             load_average_1min,
             load_average_5min,

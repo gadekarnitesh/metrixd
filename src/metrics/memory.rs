@@ -1,8 +1,7 @@
-
-use prometheus::{register_gauge, Gauge};
 use crate::collector::Collector;
-use sysinfo::System;
+use prometheus::{register_gauge, Gauge};
 use std::sync::Mutex;
+use sysinfo::System;
 
 pub struct MemoryCollector {
     memory_usage_percent: Gauge,
@@ -14,10 +13,14 @@ pub struct MemoryCollector {
 
 impl MemoryCollector {
     pub fn new() -> Self {
-        let memory_usage_percent = register_gauge!("memory_usage_percent", "Memory usage in percentage").unwrap();
-        let memory_total_bytes = register_gauge!("memory_total_bytes", "Total memory in bytes").unwrap();
-        let memory_used_bytes = register_gauge!("memory_used_bytes", "Used memory in bytes").unwrap();
-        let memory_available_bytes = register_gauge!("memory_available_bytes", "Available memory in bytes").unwrap();
+        let memory_usage_percent =
+            register_gauge!("memory_usage_percent", "Memory usage in percentage").unwrap();
+        let memory_total_bytes =
+            register_gauge!("memory_total_bytes", "Total memory in bytes").unwrap();
+        let memory_used_bytes =
+            register_gauge!("memory_used_bytes", "Used memory in bytes").unwrap();
+        let memory_available_bytes =
+            register_gauge!("memory_available_bytes", "Available memory in bytes").unwrap();
         let system = Mutex::new(System::new_all());
 
         MemoryCollector {
@@ -25,7 +28,7 @@ impl MemoryCollector {
             memory_total_bytes,
             memory_used_bytes,
             memory_available_bytes,
-            system
+            system,
         }
     }
 }

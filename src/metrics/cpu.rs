@@ -1,9 +1,8 @@
-
-use prometheus::{register_gauge, register_counter, register_histogram, Gauge, Counter, Histogram};
 use crate::collector::Collector;
-use sysinfo::System;
-use std::sync::Mutex;
+use prometheus::{register_counter, register_gauge, register_histogram, Counter, Gauge, Histogram};
 use rand::random;
+use std::sync::Mutex;
+use sysinfo::System;
 
 pub struct CpuCollector {
     // Gauge for current CPU usage
@@ -25,43 +24,37 @@ pub struct CpuCollector {
 impl CpuCollector {
     pub fn new() -> Self {
         // Gauge metrics for current CPU state
-        let cpu_usage = register_gauge!(
-            "cpu_usage_percent",
-            "Current CPU usage percentage"
-        ).unwrap();
+        let cpu_usage =
+            register_gauge!("cpu_usage_percent", "Current CPU usage percentage").unwrap();
 
-        let cpu_cores = register_gauge!(
-            "cpu_cores_total",
-            "Total number of CPU cores"
-        ).unwrap();
+        let cpu_cores = register_gauge!("cpu_cores_total", "Total number of CPU cores").unwrap();
 
-        let cpu_frequency_mhz = register_gauge!(
-            "cpu_frequency_mhz",
-            "Current CPU frequency in MHz"
-        ).unwrap();
+        let cpu_frequency_mhz =
+            register_gauge!("cpu_frequency_mhz", "Current CPU frequency in MHz").unwrap();
 
         // Counter metrics for CPU time (cumulative)
         let cpu_time_user_seconds_total = register_counter!(
             "cpu_time_user_seconds_total",
             "Total CPU time spent in user mode"
-        ).unwrap();
+        )
+        .unwrap();
 
         let cpu_time_system_seconds_total = register_counter!(
             "cpu_time_system_seconds_total",
             "Total CPU time spent in system mode"
-        ).unwrap();
+        )
+        .unwrap();
 
-        let cpu_time_idle_seconds_total = register_counter!(
-            "cpu_time_idle_seconds_total",
-            "Total CPU time spent idle"
-        ).unwrap();
+        let cpu_time_idle_seconds_total =
+            register_counter!("cpu_time_idle_seconds_total", "Total CPU time spent idle").unwrap();
 
         // Histogram for CPU load distribution
         let cpu_load_histogram = register_histogram!(
             "cpu_load_distribution",
             "Distribution of CPU load measurements",
             vec![0.0, 10.0, 25.0, 50.0, 75.0, 90.0, 95.0, 99.0, 100.0]
-        ).unwrap();
+        )
+        .unwrap();
 
         let system = Mutex::new(System::new_all());
 
@@ -95,7 +88,9 @@ impl Collector for CpuCollector {
         self.cpu_cores.set(system.cpus().len() as f64);
 
         // Get CPU frequency (use first CPU's frequency as representative)
-        let cpu_frequency = system.cpus().first()
+        let cpu_frequency = system
+            .cpus()
+            .first()
             .map(|cpu| cpu.frequency())
             .unwrap_or(0) as f64;
         self.cpu_frequency_mhz.set(cpu_frequency);
@@ -106,7 +101,8 @@ impl Collector for CpuCollector {
         let simulated_idle_time = random::<f64>() * 100.0;
 
         self.cpu_time_user_seconds_total.inc_by(simulated_user_time);
-        self.cpu_time_system_seconds_total.inc_by(simulated_system_time);
+        self.cpu_time_system_seconds_total
+            .inc_by(simulated_system_time);
         self.cpu_time_idle_seconds_total.inc_by(simulated_idle_time);
 
         // Record CPU usage in histogram for distribution analysis

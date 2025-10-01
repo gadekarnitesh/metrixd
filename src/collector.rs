@@ -1,5 +1,3 @@
-
-
 use prometheus::Result;
 
 pub trait Collector {

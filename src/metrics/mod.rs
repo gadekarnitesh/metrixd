@@ -1,11 +1,11 @@
 mod cpu;
-mod memory;
 mod disk;
-mod system;
+mod memory;
 mod network;
+mod system;
 
 pub use cpu::CpuCollector;
-pub use memory::MemoryCollector;
 pub use disk::DiskCollector;
-pub use system::SystemCollector;
+pub use memory::MemoryCollector;
 pub use network::NetworkCollector;
+pub use system::SystemCollector;

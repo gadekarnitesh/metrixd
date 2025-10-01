@@ -1,21 +1,22 @@
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use std::time::Duration;
+use tokio::sync::Mutex;
 use tokio::task;
 
-use prometheus::{Encoder, TextEncoder, gather};
-use hyper::{Body, Request, Response, Server};
 use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Request, Response, Server};
+use prometheus::{gather, Encoder, TextEncoder};
 use std::net::SocketAddr;
 
 mod collector;
 mod metrics;
 
 use crate::collector::Collector;
-use crate::metrics::{CpuCollector, MemoryCollector, DiskCollector, SystemCollector, NetworkCollector};
+use crate::metrics::{
+    CpuCollector, DiskCollector, MemoryCollector, NetworkCollector, SystemCollector,
+};
 #[tokio::main]
 async fn main() {
-    
     // Create your collectors
     let collectors: Vec<Box<dyn Collector + Send + Sync>> = vec![
         Box::new(CpuCollector::new()),
@@ -27,7 +28,9 @@ async fn main() {
 
     // Register all metrics
     for collector in &collectors {
-        collector.register_metrics().expect("register_metrics failed");
+        collector
+            .register_metrics()
+            .expect("register_metrics failed");
     }
 
     // Wrap in Arc<Mutex> to share safely with async tasks
@@ -53,11 +56,8 @@ async fn main() {
     // Start HTTP server to expose metrics
     let addr = SocketAddr::from(([0, 0, 0, 0], 9100));
 
-    let make_svc = make_service_fn(|_conn| {
-        async {
-            Ok::<_, hyper::Error>(service_fn(metrics_handler))
-        }
-    });
+    let make_svc =
+        make_service_fn(|_conn| async { Ok::<_, hyper::Error>(service_fn(metrics_handler)) });
 
     println!("Serving metrics on http://{}", addr);
 
@@ -68,7 +68,7 @@ async fn metrics_handler(_req: Request<Body>) -> std::result::Result<Response<Bo
     let encoder = TextEncoder::new();
     let metric_families = gather();
     let mut buffer = Vec::new();
-    
+
     if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
         eprintln!("Failed to encode metrics: {}", e);
         return Ok(Response::builder()
@@ -76,7 +76,7 @@ async fn metrics_handler(_req: Request<Body>) -> std::result::Result<Response<Bo
             .body(Body::from("Internal Server Error"))
             .unwrap());
     }
-    
+
     Ok(Response::builder()
         .header("Content-Type", encoder.format_type())
         .body(Body::from(buffer))
